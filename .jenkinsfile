@@ -1,0 +1,30 @@
+pipeline {
+    agent {
+        docker { image 'megavivado' }
+    }
+    stages {
+        stage('Cleanup') {
+            steps {
+                sh 'make USE_LOCAL_CC65=0 cleanall'
+            }
+        }
+        stage('Build Freezer') {
+            steps {
+                sh 'make USE_LOCAL_CC65=0 freezer_files'
+            }
+        }
+        stage('Build MEGA65R3') {
+            steps {
+                sh 'make USE_LOCAL_CC65=0 bin/mega65r3.bit'
+            }
+        }
+        stage('Publish') {
+            steps {
+                sh 'gh release list'
+            }
+        }
+    }
+    environment {
+        GH_TOKEN = credentials('mega65-github-api')
+    }
+}
