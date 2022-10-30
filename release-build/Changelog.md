@@ -1,7 +1,7 @@
 
 # Changelog
 
-## Release 0.95 (commit hash tbd)
+## Release 0.95 (commit hash 93d55f0)
 
 This is the Batch 2 Release (October 2022). Please look into
 [mega65-core](https://github.com/MEGA65/mega65-core/issues) for a
@@ -12,6 +12,7 @@ complete changelog.
    [#612](https://github.com/MEGA65/mega65-core/issues/612)
    [#611](https://github.com/MEGA65/mega65-core/issues/611)
    [#612](https://github.com/MEGA65/mega65-core/issues/612)
+   [#624](https://github.com/MEGA65/mega65-core/issues/624)
  - fixed placement of I/O components to improve build quality
    [#603](https://github.com/MEGA65/mega65-core/issues/603)
  - fdisk tool improvements (rescan bus, skip or select population)

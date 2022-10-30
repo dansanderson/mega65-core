@@ -1,6 +1,9 @@
 pipeline {
     agent {
-        docker { image 'megavivado' }
+        docker {
+            image 'megavivado'
+            args '--init'
+        }
     }
     stages {
         stage('Cleanup') {
