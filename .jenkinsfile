@@ -18,7 +18,7 @@ pipeline {
         }
         stage('Build MEGA65R3') {
             steps {
-                sh 'make USE_LOCAL_CC65=0 bin/mega65r3.bit'
+                sh 'make VIVADO=/home/mega/vivado_wrapper.sh USE_LOCAL_CC65=0 bin/mega65r3.bit'
             }
         }
         stage('Publish') {
