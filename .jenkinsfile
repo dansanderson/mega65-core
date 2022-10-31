@@ -1,8 +1,8 @@
 pipeline {
     agent {
         docker {
-            image 'megavivado'
-            args '--init'
+            image 'megabuild'
+            args '--init -v vivado_2019_2:/opt/Xilinx'
         }
     }
     stages {
