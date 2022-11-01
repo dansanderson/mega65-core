@@ -1104,7 +1104,8 @@ $(BINDIR)/%.bit: 	vivado/%.xpr $(VHDLSRCDIR)/*.vhdl $(VHDLSRCDIR)/*.xdc $(VERILO
 	cp vivado.log $(BINDIR)/$*-`cat $(SRCDIR)/version.txt`.log
 	# Run timing summary report
 	echo ./vivado_timing $(subst bin/,,$*)
-	./vivado_timing $(subst bin/,,$*)
+	# use vivado_wrapper to run timings
+	VIVADO=$(VIVADO) ./vivado_timing $(subst bin/,,$*)
 	# Make a copy of the timing report named after the commit and datestamp
 	cp $(subst bin/,,$*).timing.txt $(BINDIR)/$*-`cat $(SRCDIR)/version.txt`.timing.txt
 
