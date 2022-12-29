@@ -21,6 +21,11 @@ pipeline {
                 sh 'make VIVADO=/opt/Xilinx/vivado_wrapper.sh USE_LOCAL_CC65=0 bin/mega65r3.bit'
             }
         }
+        stage('Build Nexys4DDR') {
+            steps {
+                sh 'make VIVADO=/opt/Xilinx/vivado_wrapper.sh USE_LOCAL_CC65=0 bin/nexys4ddr-widget.bit'
+            }
+        }
         stage('Publish') {
             steps {
                 sh 'gh release list'
