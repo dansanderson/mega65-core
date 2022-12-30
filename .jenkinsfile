@@ -42,7 +42,7 @@ pipeline {
     }
     post {
         always {
-            archiveArtifacts artifacts: "release-build/pkg/*-build-${BUILD_NUMBER}.7z"
+            archiveArtifacts artifacts: "release-build/pkg/*-build-${BUILD_NUMBER}.7z",
                 onlyIfSuccessful: true,
                 fingerprint: true
         }
