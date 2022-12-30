@@ -9,7 +9,7 @@ pipeline {
         stage('Setup toolchain') {
             steps {
                 sh 'echo "AUTO-BUILD#$BUILD_NUMBER"'
-                sh 'echo "${GIT_BRANCH:0:5}"'
+                sh 'echo "$${GIT_BRANCH:0:5}"'
                 sh 'release-build/prepare.sh'
             }
         }
