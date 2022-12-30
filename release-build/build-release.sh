@@ -64,6 +64,26 @@ for file in ${EXTRA_FILES}; do
     fi
 done
 
+if [[ ${MODEL} = "mega65r3" ]]; then
+    RM_TARGET="MEGA65R3 boards -- DevKit, MEGA65 R3 and R3a (Artix A7 200T FPGA)"
+elif [[ ${MODEL} = "mega65r2" ]]; then
+    RM_TARGET="MEGA65R2 boards -- Limited Testkit (Artix A7 100T FPGA)"
+elif [[ ${MODEL} = "nexys4ddr-widget" ]]; then
+    RM_TARGET="Nexys4DDR boards -- Nexys4DDR, NexysA7 (Artix A7 100T FPGA)"
+else
+    usage "unknown model ${MODEL}"
+fi
+
+# we always pack the latest bitstream
+BITPATH=$( ls -1 --sort time ${REPOPATH}/bin/${MODEL}*.bit | head -1 )
+BITNAME=${BITPATH##*/}
+BITBASE=${BITNAME%.bit}
+HASH=${BITBASE##*-}
+
+echo
+echo "Bitstream found: ${BITNAME}"
+echo
+
 # determine branch
 if [[ -n ${JENKINS_SERVER_COOKIE} ]]; then
     BRANCH=${BRANCH_NAME:0:6}
@@ -75,16 +95,6 @@ else
     BRANCH=`git rev-parse --abbrev-ref HEAD`
     BRANCH=${BRANCH:0:6}
     PKGNAME=${MODEL}-${BRANCH}-${HASH}
-fi
-
-if [[ ${MODEL} = "mega65r3" ]]; then
-    RM_TARGET="MEGA65R3 boards -- DevKit, MEGA65 R3 and R3a (Artix A7 200T FPGA)"
-elif [[ ${MODEL} = "mega65r2" ]]; then
-    RM_TARGET="MEGA65R2 boards -- Limited Testkit (Artix A7 100T FPGA)"
-elif [[ ${MODEL} = "nexys4ddr-widget" ]]; then
-    RM_TARGET="Nexys4DDR boards -- Nexys4DDR, NexysA7 (Artix A7 100T FPGA)"
-else
-    usage "unknown model ${MODEL}"
 fi
 
 PKGBASE=${SCRIPTPATH}/pkg
@@ -109,16 +119,6 @@ for txtfile in README.md Changelog.md; do
     echo ".. ${txtfile}"
     ( RM_TARGET=${RM_TARGET} envsubst < ${SCRIPTPATH}/${txtfile} > ${PKGPATH}/${txtfile} )
 done
-
-# we always pack the latest bitstream
-BITPATH=$( ls -1 --sort time ${REPOPATH}/bin/${MODEL}*.bit | head -1 )
-BITNAME=${BITPATH##*/}
-BITBASE=${BITNAME%.bit}
-HASH=${BITBASE##*-}
-
-echo
-echo "Bitstream found: ${BITNAME}"
-echo
 
 if [[ ${REPACK} -eq 0 ]]; then
     echo "Copying build files"
