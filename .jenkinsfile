@@ -8,9 +8,9 @@ pipeline {
     stages {
         stage('Setup toolchain') {
             steps {
-                sh 'echo "AUTO-BUILD#$BUILD_NUMBER"'
-                sh 'echo "$${GIT_BRANCH:0:5}"'
                 sh 'release-build/prepare.sh'
+                sh 'echo "$BRANCH_SHORT"'
+                sh '/bin/false'
             }
         }
         stage('Cleanup') {
@@ -56,5 +56,6 @@ pipeline {
     }
     environment {
         GH_TOKEN = credentials('mega65-github-api')
+        BRANCH_SHORT = sh (returnStdout: true, script: 'echo $BRANCH_NAME | sed -r \'s/^(.{5}).*$/\1/\'').trim()
     }
 }
