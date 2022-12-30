@@ -70,9 +70,11 @@ if [[ -n ${JENKINS_SERVER_COOKIE} ]]; then
     if [[ ${VERSION} = "JENKINSGEN" ]]; then
         VERSION="UNSAFE#${BUILD_NUMBER} ${BRANCH}"
     fi
+    PKGNAME=${MODEL}-${BRANCH}-${BUILD_NUMBER}-${HASH}
 else
     BRANCH=`git rev-parse --abbrev-ref HEAD`
     BRANCH=${BRANCH:0:6}
+    PKGNAME=${MODEL}-${BRANCH}-${HASH}
 fi
 
 if [[ ${MODEL} = "mega65r3" ]]; then
@@ -86,7 +88,7 @@ else
 fi
 
 PKGBASE=${SCRIPTPATH}/pkg
-PKGPATH=${PKGBASE}/${MODEL}-${BRANCH}
+PKGPATH=${PKGBASE}/${PKGNAME}
 REPOPATH=${SCRIPTPATH%/*}
 
 if [[ ${REPACK} -eq 0 ]]; then
