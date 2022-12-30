@@ -9,8 +9,6 @@ pipeline {
         stage('Setup toolchain') {
             steps {
                 sh 'release-build/prepare.sh'
-                sh 'echo "$BRANCH_SHORT"'
-                sh '/bin/false'
             }
         }
         stage('Cleanup') {
@@ -26,7 +24,7 @@ pipeline {
         stage('Build MEGA65R3') {
             steps {
                 sh 'make VIVADO=/opt/Xilinx/vivado_wrapper.sh USE_LOCAL_CC65=0 bin/mega65r3.bit'
-                sh 'release-build/build-release.sh mega65r3 "AUTO-BUILD#$BUILD_NUMBER ${GIT_BRANCH:0:5}"'
+                sh 'release-build/build-release.sh mega65r3 JENKINSGEN'
             }
         }
         stage('Build MEGA65R2') {

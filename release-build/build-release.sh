@@ -11,6 +11,7 @@ usage () {
     echo "  -repack  don't copy new stuff, redo cor and mcs, make new 7z"
     echo "  MODEL    one of mega65r3, mega65r2, nexys4ddr-widget"
     echo "  VERSION  version string to put before the hash into the core version"
+    echo "           the value JENKINSGEN will auto generate this text from environ"
     echo "  EXTRA    file to put into the mega65r3 cor for fdisk population"
     echo "           (default is everything in sdcard-files)"
     echo
@@ -24,7 +25,7 @@ usage () {
 }
 
 # check if we are in jenkins environment
-if [[ -n ${BUILD_TAG} ]]; then
+if [[ -n ${JENKINS_SERVER_COOKIE} ]]; then
     BIT2COR=${SCRIPTPATH}/mega65-tools/bin/bit2core
     BIT2MCS=${SCRIPTPATH}/mega65-tools/bin/bit2mcs
     REGTEST=${SCRIPTPATH}/mega65-tools/src/tests/regression-test.sh
@@ -64,8 +65,15 @@ for file in ${EXTRA_FILES}; do
 done
 
 # determine branch
-BRANCH=`git rev-parse --abbrev-ref HEAD`
-BRANCH=${BRANCH:0:6}
+if [[ -n ${JENKINS_SERVER_COOKIE} ]]; then
+    BRANCH=${BRANCH_NAME:0:6}
+    if [[ ${VERSION} = "JENKINSGEN" ]]; then
+        VERSION="AUTO-BUILD#${BUILD_NUMBER} ${BRANCH}"
+    fi
+else
+    BRANCH=`git rev-parse --abbrev-ref HEAD`
+    BRANCH=${BRANCH:0:6}
+fi
 
 if [[ ${MODEL} = "mega65r3" ]]; then
     RM_TARGET="MEGA65R3 boards -- DevKit, MEGA65 R3 and R3a (Artix A7 200T FPGA)"
