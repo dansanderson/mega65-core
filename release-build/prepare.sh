@@ -20,4 +20,4 @@ git clone https://github.com/MEGA65/mega65-tools.git || ( echo "failed to clone 
 echo
 echo "Building tools..."
 cd mega65-tools
-make bin/m65 bin/bit2core bin/bit2mcs tests || ( echo "failed to build mega65-tools"; exit 3)
+make USE_LOCAL_CC65=0 bin/m65 bin/bit2core bin/bit2mcs tests || ( echo "failed to build mega65-tools"; exit 3)
