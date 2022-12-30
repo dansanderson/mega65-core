@@ -68,7 +68,7 @@ done
 if [[ -n ${JENKINS_SERVER_COOKIE} ]]; then
     BRANCH=${BRANCH_NAME:0:6}
     if [[ ${VERSION} = "JENKINSGEN" ]]; then
-        VERSION="AUTO-BUILD#${BUILD_NUMBER} ${BRANCH}"
+        VERSION="UNSAFE#${BUILD_NUMBER} ${BRANCH}"
     fi
 else
     BRANCH=`git rev-parse --abbrev-ref HEAD`
@@ -150,12 +150,14 @@ if [[ ${NOREG} -eq 1 ]]; then
     echo "Skipping regression tests"
     if [[ ${REPACK} -eq 0 ]]; then
         touch ${PKGPATH}/WARNING_NO_TESTS_COULD_BE_EXECUTED
+        touch ${PKGPATH}/ATTENTION_THIS_CAN_BRICK_YOUR_MEGA65
     fi
 else
     echo "Starting regression tests"
     ${REGTEST} ${BITPATH} ${PKGPATH}/log/
     if [[ $? -ne 0 ]]; then
         touch ${PKGPATH}/WARNING_TESTS_HAVE_FAILED_SEE_LOGS
+        touch ${PKGPATH}/ATTENTION_THIS_CAN_BRICK_YOUR_MEGA65
     fi
     echo "done"
 fi
@@ -172,3 +174,4 @@ fi
 
 # 7z will only put the relative paths between ARCFILE and PKGPATH inside the archive. smart!
 7z a ${ARCFILE} ${PKGPATH}
+
