@@ -1,14 +1,15 @@
 #!/bin/bash
 
-SCRIPT=`realpath $0`
-SCRIPTPATH=`dirname $SCRIPT`
+SCRIPT="$(readlink --canonicalize-existing "$0")"
+SCRIPTPATH="$(dirname "${SCRIPT}")"
+SCRIPTNAME=${SCRIPT##*/}
 
 cd $SCRIPTPATH
 
 # freshly clone release prep
-echo "Removing and recloning mega65-release-prep..."
-rm -rf mega65-release-prep
-git clone https://github.com/MEGA65/mega65-release-prep.git || ( echo "failed to clone mega65-release-prep"; exit 1 )
+#echo "Removing and recloning mega65-release-prep..."
+#rm -rf mega65-release-prep
+#git clone https://github.com/MEGA65/mega65-release-prep.git || ( echo "failed to clone mega65-release-prep"; exit 1 )
 
 # freshly clone tools
 echo
@@ -19,4 +20,4 @@ git clone https://github.com/MEGA65/mega65-tools.git || ( echo "failed to clone 
 echo
 echo "Building tools..."
 cd mega65-tools
-make bin/bit2core bin/bit2mcs || ( echo "failed to build bit2core and bit2mcs"; exit 3)
+make bin/m65 bin/bit2core bin/bit2mcs tests || ( echo "failed to build mega65-tools"; exit 3)
