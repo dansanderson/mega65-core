@@ -141,7 +141,11 @@ else
 fi
 echo
 
-ARCFILE=${PKGBASE}/${MODEL}-${BRANCH}-${HASH}.7z
+if [[ -n ${BUILD_TAG} ]]; then
+    ARCFILE=${PKGBASE}/${MODEL}-${BRANCH}-build-${BUILD_NUMBER}.7z
+else
+    ARCFILE=${PKGBASE}/${MODEL}-${BRANCH}-${HASH}.7z
+fi
 if [[ -e ${ARCFILE} ]]; then
     rm -f ${ARCFILE}
 fi

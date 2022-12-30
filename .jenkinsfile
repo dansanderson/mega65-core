@@ -19,6 +19,7 @@ pipeline {
         stage('Build MEGA65R3') {
             steps {
                 sh 'make VIVADO=/opt/Xilinx/vivado_wrapper.sh USE_LOCAL_CC65=0 bin/mega65r3.bit'
+                sh 'release-build/build-release.sh mega65r3 "AUTO-BUILD#$BUILD_NUMBER ${GIT_BRANCH:0:5}"'
             }
         }
         stage('Build MEGA65R2') {
@@ -37,6 +38,13 @@ pipeline {
             steps {
                 sh 'gh release list'
             }
+        }
+    }
+    post {
+        always {
+            archiveArtifacts artifacts: "release-build/pkg/*-build-${BUILD_NUMBER}.7z"
+                onlyIfSuccessful: true,
+                fingerprint: true
         }
     }
     environment {
