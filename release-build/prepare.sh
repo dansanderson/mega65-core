@@ -4,7 +4,11 @@ SCRIPT="$(readlink --canonicalize-existing "$0")"
 SCRIPTPATH="$(dirname "${SCRIPT}")"
 SCRIPTNAME=${SCRIPT##*/}
 
-cd $SCRIPTPATH
+cd ${SCRIPTPATH}
+
+if [[ $1 = "prunepkg" ]]; then
+    rm -rf pkg
+fi
 
 # freshly clone release prep
 #echo "Removing and recloning mega65-release-prep..."
