@@ -23,6 +23,18 @@ usage () {
     exit 1
 }
 
+# check if we are in jenkins environment
+if [[ -n ${BUILD_TAG} ]]; then
+    BIT2COR=${SCRIPTPATH}/mega65-tools/bin/bit2core
+    BIT2MCS=${SCRIPTPATH}/mega65-tools/bin/bit2mcs
+    REGTEST=${SCRIPTPATH}/mega65-tools/src/tests/regression-test.sh
+else
+    BIT2COR=bit2core
+    BIT2MCS=bit2mcs
+    # tools on the same level as the mega65-core repo
+    REGTEST=${REPOPATH}/../mega65-tools/src/tests/regression-test.sh
+fi
+
 REPACK=0
 NOREG=0
 while [[ $# -gt 2 && $1 =~ ^-.+ ]]; do
@@ -116,13 +128,13 @@ fi
 echo "Building COR/MCS"
 echo
 if [[ ${MODEL} == "nexys4ddr-widget" ]]; then
-    bit2core nexys4ddrwidget ${PKGPATH}/${BITNAME} MEGA65 "${VERSION} ${HASH}" ${PKGPATH}/${BITBASE}.cor
+    ${BIT2COR} nexys4ddrwidget ${PKGPATH}/${BITNAME} MEGA65 "${VERSION} ${HASH}" ${PKGPATH}/${BITBASE}.cor
 elif [[ ${MODEL} == "mega65r2" ]]; then
-    bit2core mega65r2 ${PKGPATH}/${BITNAME} MEGA65 "${VERSION} ${HASH}" ${PKGPATH}/${BITBASE}.cor
+    ${BIT2COR} mega65r2 ${PKGPATH}/${BITNAME} MEGA65 "${VERSION} ${HASH}" ${PKGPATH}/${BITBASE}.cor
 else
-    bit2core ${MODEL} ${PKGPATH}/${BITNAME} MEGA65 "${VERSION} ${HASH}" ${PKGPATH}/${BITBASE}.cor ${EXTRA_FILES} ${PKGPATH}/sdcard-files/*
+    ${BIT2COR} ${MODEL} ${PKGPATH}/${BITNAME} MEGA65 "${VERSION} ${HASH}" ${PKGPATH}/${BITBASE}.cor ${EXTRA_FILES} ${PKGPATH}/sdcard-files/*
 fi
-bit2mcs ${PKGPATH}/${BITBASE}.cor ${PKGPATH}/${BITBASE}.mcs 0
+${BIT2MCS} ${PKGPATH}/${BITBASE}.cor ${PKGPATH}/${BITBASE}.mcs 0
 
 # do regression tests
 echo
@@ -133,7 +145,7 @@ if [[ ${NOREG} -eq 1 ]]; then
     fi
 else
     echo "Starting regression tests"
-    ${REPOPATH}/../mega65-tools/src/tests/regression-test.sh ${BITPATH} ${PKGPATH}/log/
+    ${REGTEST} ${BITPATH} ${PKGPATH}/log/
     if [[ $? -ne 0 ]]; then
         touch ${PKGPATH}/WARNING_TESTS_HAVE_FAILED_SEE_LOGS
     fi
