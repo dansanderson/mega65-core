@@ -3,6 +3,7 @@
 SCRIPT="$(readlink --canonicalize-existing "$0")"
 SCRIPTPATH="$(dirname "${SCRIPT}")"
 SCRIPTNAME=${SCRIPT##*/}
+REPOPATH=${SCRIPTPATH%/*}
 
 usage () {
     echo "Usage: ${SCRIPTNAME} [-noreg] [-repack] MODEL VERSION [EXTRA]"
@@ -99,8 +100,6 @@ fi
 
 PKGBASE=${SCRIPTPATH}/pkg
 PKGPATH=${PKGBASE}/${PKGNAME}
-REPOPATH=${SCRIPTPATH%/*}
-
 if [[ ${REPACK} -eq 0 ]]; then
     echo "Cleaning ${PKGPATH}"
     echo
