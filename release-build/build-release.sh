@@ -12,11 +12,14 @@ usage () {
     echo "  -repack  don't copy new stuff, redo cor and mcs, make new 7z"
     echo "  MODEL    one of mega65r3, mega65r2, nexys4ddr-widget"
     echo "  VERSION  version string to put before the hash into the core version"
-    echo "           the value JENKINSGEN will auto generate this text from environ"
+    echo "           maximum 31 chars. The string HASH will be replaced by the"
+    echo "           hash of the build."
+    echo "           The value JENKINSGEN will auto generate this text from"
+    echo "           environ 'JENKINS#NUM BRANCH HASH'"
     echo "  EXTRA    file to put into the mega65r3 cor for fdisk population"
     echo "           (default is everything in sdcard-files)"
     echo
-    echo "Example: ${SCRIPTNAME} mega65r3 'Experimental Build'"
+    echo "Example: ${SCRIPTNAME} mega65r3 'Experimental Build HASH'"
     echo
     if [[ "x$1" != "x" ]]; then
         echo $1
@@ -89,13 +92,14 @@ echo
 if [[ -n ${JENKINS_SERVER_COOKIE} ]]; then
     BRANCH=${BRANCH_NAME:0:6}
     if [[ ${VERSION} = "JENKINSGEN" ]]; then
-        VERSION="UNSAFE#${BUILD_NUMBER} ${BRANCH}"
+        VERSION="JENKINS#${BUILD_NUMBER} ${BRANCH} ${HASH}"
     fi
     PKGNAME=${MODEL}-${BRANCH}-${BUILD_NUMBER}-${HASH}
 else
     BRANCH=`git rev-parse --abbrev-ref HEAD`
     BRANCH=${BRANCH:0:6}
     PKGNAME=${MODEL}-${BRANCH}-${HASH}
+    VERSION=${VERSION/HASH/$HASH}
 fi
 
 PKGBASE=${SCRIPTPATH}/pkg
@@ -114,10 +118,13 @@ done
 
 # put text files into package path
 echo "Creating info files from templates"
+echo
 for txtfile in README.md Changelog.md; do
     echo ".. ${txtfile}"
     ( RM_TARGET=${RM_TARGET} envsubst < ${SCRIPTPATH}/${txtfile} > ${PKGPATH}/${txtfile} )
 done
+
+UNSAFE=0
 
 if [[ ${REPACK} -eq 0 ]]; then
     echo "Copying build files"
@@ -131,40 +138,48 @@ if [[ ${REPACK} -eq 0 ]]; then
     VIOLATIONS=$( grep -c VIOL ${BITPATH%.bit}.timing.txt )
     if [[ $VIOLATIONS -gt 0 ]]; then
         touch ${PKGPATH}/WARNING_${VIOLATIONS}_TIMING_VIOLATIONS
+        UNSAFE=1
     fi
 fi
 
-echo "Building COR/MCS"
-echo
-if [[ ${MODEL} == "nexys4ddr-widget" ]]; then
-    ${BIT2COR} nexys4ddrwidget ${PKGPATH}/${BITNAME} MEGA65 "${VERSION} ${HASH}" ${PKGPATH}/${BITBASE}.cor
-elif [[ ${MODEL} == "mega65r2" ]]; then
-    ${BIT2COR} mega65r2 ${PKGPATH}/${BITNAME} MEGA65 "${VERSION} ${HASH}" ${PKGPATH}/${BITBASE}.cor
-else
-    ${BIT2COR} ${MODEL} ${PKGPATH}/${BITNAME} MEGA65 "${VERSION} ${HASH}" ${PKGPATH}/${BITBASE}.cor ${EXTRA_FILES} ${PKGPATH}/sdcard-files/*
-fi
-${BIT2MCS} ${PKGPATH}/${BITBASE}.cor ${PKGPATH}/${BITBASE}.mcs 0
-
 # do regression tests
-echo
 if [[ ${NOREG} -eq 1 ]]; then
     echo "Skipping regression tests"
     if [[ ${REPACK} -eq 0 ]]; then
         touch ${PKGPATH}/WARNING_NO_TESTS_COULD_BE_EXECUTED
-        touch ${PKGPATH}/ATTENTION_THIS_CAN_BRICK_YOUR_MEGA65
+        UNSAFE=1
     fi
 else
     echo "Starting regression tests"
     ${REGTEST} ${BITPATH} ${PKGPATH}/log/
     if [[ $? -ne 0 ]]; then
         touch ${PKGPATH}/WARNING_TESTS_HAVE_FAILED_SEE_LOGS
-        touch ${PKGPATH}/ATTENTION_THIS_CAN_BRICK_YOUR_MEGA65
+        UNSAFE=1
     fi
     echo "done"
 fi
 echo
 
-if [[ -n ${BUILD_TAG} ]]; then
+if [[ ${UNSAFE} -eq 1 ]]; then
+    touch ${PKGPATH}/ATTENTION_THIS_COULD_BRICK_YOUR_MEGA65
+    # also replace JENKINS# prefix in version with UNSAFE#
+    if [[ ${VERSION:0:8} = "JENKINS#" ]]; then
+        VERSION="UNSAFE#${VERSION:8}"
+    fi
+fi
+
+echo "Building COR/MCS"
+echo
+if [[ ${MODEL} == "nexys4ddr-widget" ]]; then
+    ${BIT2COR} nexys4ddrwidget ${PKGPATH}/${BITNAME} MEGA65 "${VERSION:0:31}" ${PKGPATH}/${BITBASE}.cor
+elif [[ ${MODEL} == "mega65r2" ]]; then
+    ${BIT2COR} mega65r2 ${PKGPATH}/${BITNAME} MEGA65 "${VERSION:0:31}" ${PKGPATH}/${BITBASE}.cor
+else
+    ${BIT2COR} ${MODEL} ${PKGPATH}/${BITNAME} MEGA65 "${VERSION:0:31}" ${PKGPATH}/${BITBASE}.cor ${EXTRA_FILES} ${PKGPATH}/sdcard-files/*
+fi
+${BIT2MCS} ${PKGPATH}/${BITBASE}.cor ${PKGPATH}/${BITBASE}.mcs 0
+
+if [[ -n ${JENKINS_SERVER_COOKIE} ]]; then
     ARCFILE=${PKGBASE}/${MODEL}-${BRANCH}-build-${BUILD_NUMBER}.7z
 else
     ARCFILE=${PKGBASE}/${MODEL}-${BRANCH}-${HASH}.7z
