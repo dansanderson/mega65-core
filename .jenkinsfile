@@ -13,7 +13,6 @@ pipeline {
         }
         stage('Cleanup') {
             steps {
-                sh 'cd /opt/Xilinx/Vivado/2022.2/bin/unwrapped/lnx64.o/ && ./lmutil lmhostid -ptype PHY -n'
                 sh 'make USE_LOCAL_CC65=0 cleanall'
             }
         }
