@@ -9,6 +9,7 @@ pipeline {
         stage('Setup toolchain') {
             steps {
                 sh 'release-build/prepare.sh prunepkg'
+                sh 'find /opt/Xilinx/Vivado -name lmutil'
                 sh '/opt/Xilinx/Vivado/2022.2/bin/unwrapped/lnx64.o/lmutil lmhostid -ptype PHY -n'
             }
         }
