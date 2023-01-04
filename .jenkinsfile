@@ -9,17 +9,11 @@ pipeline {
         stage('Setup toolchain') {
             steps {
                 sh 'release-build/prepare.sh prunepkg'
-                sh 'find /opt/Xilinx/Vivado -name lmutil'
-                sh 'ls -l /opt/Xilinx/Vivado/'
-                sh 'ls -l /opt/Xilinx/Vivado/2022.2/'
-                sh 'ls -l /opt/Xilinx/Vivado/2022.2/bin/'
-                sh 'ls -l /opt/Xilinx/Vivado/2022.2/bin/unwrapped/'
-                sh 'ls -l /opt/Xilinx/Vivado/2022.2/bin/unwrapped/lnx64.o/'
-                sh '/opt/Xilinx/Vivado/2022.2/bin/unwrapped/lnx64.o/lmutil lmhostid -ptype PHY -n'
             }
         }
         stage('Cleanup') {
             steps {
+                sh 'cd /opt/Xilinx/Vivado/2022.2/bin/unwrapped/lnx64.o/ && ./lmutil lmhostid -ptype PHY -n'
                 sh 'make USE_LOCAL_CC65=0 cleanall'
             }
         }
