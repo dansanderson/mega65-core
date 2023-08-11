@@ -52,8 +52,9 @@ architecture behavioral of matrix_to_ascii is
   -- (As key repeat is checked on each of the 72 key tests, we don't need to
   -- divide the maximum repeat counters by 72.)
   signal repeat_key : integer range 0 to 71 := 0;
-  constant repeat_start_timer : integer := clock_frequency/scan_frequency/2; -- 0.5 sec
-  constant repeat_again_timer : integer := clock_frequency/scan_frequency/10; -- 0.1 sec
+  -- Approximate MEGA65 ROM key repeat timings (August 2023)
+  constant repeat_start_timer : integer := clock_frequency/scan_frequency/2 * 19/26;
+  constant repeat_again_timer : integer := clock_frequency/scan_frequency/20;
 
   signal ascii_key_valid_countdown : integer range 0 to 65535 := 0;
 
